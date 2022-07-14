@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
+import 'package:external_path/external_path.dart';
 import 'package:flowdetect/screens/hii_video_upload.dart';
 import 'package:flutter/material.dart';
 import 'package:gallery_saver/gallery_saver.dart';
@@ -18,12 +20,21 @@ class VideoPage extends StatefulWidget {
 
 class _VideoPageState extends State<VideoPage> {
   late VideoPlayerController _videoPlayerController;
+  String? pathStorage;
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
     super.dispose();
+    print('##13july dispost Work');
+    _videoPlayerController.dispose();
   }
+
+  // @override
+  // void dispose() {
+  //   print('##13july dispost Work');
+  //   _videoPlayerController.dispose();
+  //   super.dispose();
+  // }
 
   Future _initVideoPlayer() async {
     videoPath = widget.filePath;
@@ -31,6 +42,14 @@ class _VideoPageState extends State<VideoPage> {
     await _videoPlayerController.initialize();
     await _videoPlayerController.setLooping(true);
     await _videoPlayerController.play();
+
+    findPathStorage();
+  }
+
+  Future<void> findPathStorage() async {
+    pathStorage = await ExternalPath.getExternalStoragePublicDirectory(
+        ExternalPath.DIRECTORY_MOVIES);
+    print('##13july  pathStroage ===> $pathStorage');
   }
 
   @override
@@ -95,15 +114,17 @@ class _VideoPageState extends State<VideoPage> {
                                   .then((value) {
                                 print(
                                     '##13july ===> value gallerySaver ===> ${value.toString()}');
+                                dispose();
                               });
                               File(videoPath.toString()).deleteSync();
-                              Navigator.pushNamed(
-                                context,
-                                '/videoUpload',
-                                arguments: <String, dynamic>{
-                                  'videoPath': videoPath,
-                                },
-                              );
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => VideoUpload(
+                                      videoPath: videoPath,
+                                      pathStorage: pathStorage,
+                                    ),
+                                  ));
                             },
                             icon: const Icon(Icons.save),
                             label: const Text('Save'),
@@ -113,7 +134,40 @@ class _VideoPageState extends State<VideoPage> {
                         Align(
                           alignment: Alignment.bottomRight,
                           child: FloatingActionButton.extended(
-                            onPressed: () {},
+                            onPressed: () async {
+                              _videoPlayerController.pause();
+
+                              File file = File(widget.filePath);
+
+                              var strings = file.path.split('/');
+                              String nameImage = strings.last;
+                              print('##13july ==> $nameImage');
+
+                              Map<String, dynamic> map = {};
+                              map['file'] = await MultipartFile.fromFile(
+                                file.path,
+                                filename: nameImage,
+                              );
+                              map['particle_diamiter'] = 1;
+
+                              print(
+                                  '##13july You Click Cloud file.path ==> ${file.path}');
+                              print('##13july map at cloud ==>> $map');
+
+                              FormData formData = FormData.fromMap(map);
+                              String path =
+                                  'http://113.53.253.55:5001/upload_file_api3';
+                              await Dio()
+                                  .post(
+                                path,
+                                data: formData,
+                              )
+                                  .then((value) {
+                                print('##13july value from api ==> $value');
+                              }).catchError((error) {
+                                print('##13july error from api ==> $error');
+                              });
+                            },
                             icon: const Icon(Icons.cloud),
                             label: const Text('Cloud'),
                           ),
