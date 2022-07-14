@@ -45,7 +45,7 @@ class _CameraPageState extends State<CameraPage> {
     if (_isRecording) {
       final file = await _cameraController.stopVideoRecording();
       setState(() => _isRecording = false);
-      
+
       final route = MaterialPageRoute(
         fullscreenDialog: true,
         builder: (_) => VideoPage(filePath: file.path),
@@ -60,8 +60,10 @@ class _CameraPageState extends State<CameraPage> {
 
   @override
   Widget build(BuildContext context) {
-    screenWidth = MediaQuery.of(context).size.width;
-    screenHigh = MediaQuery.of(context).size.height;
+    // screenWidth = MediaQuery.of(context).size.width;
+    // screenHigh = MediaQuery.of(context).size.height;
+    screenWidth = 250;
+    screenHigh = 250;
     if (_isLoading) {
       return Container(
         color: Colors.white,
@@ -84,38 +86,42 @@ class _CameraPageState extends State<CameraPage> {
         body: Container(
           color: Colors.black,
           child: Center(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // ClipPath(
-                //   clipper: CustomClipPath(),
-                //   child: Container(
-                //     color: Colors.blue.shade500,
-                //     child: const ClipPath(),
-                //     height: screenHigh,
-                //     width: screenWidth,
-                //   ),
-                // ),
+            child: Container(
+              width: 250,
+              height: 250,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // ClipPath(
+                  //   clipper: CustomClipPath(),
+                  //   child: Container(
+                  //     color: Colors.blue.shade500,
+                  //     child: const ClipPath(),
+                  //     height: screenHigh,
+                  //     width: screenWidth,
+                  //   ),
+                  // ),
 
-                CameraPreview(_cameraController),
+                  CameraPreview(_cameraController),
 
-                CustomPaint(
-                  size: Size(screenWidth, screenHigh),
-                  painter: Line(),
-                ),
-
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.all(25),
-                    child: FloatingActionButton(
-                      backgroundColor: Colors.red,
-                      child: Icon(_isRecording ? Icons.stop : Icons.circle),
-                      onPressed: () => _recordVideo(),
-                    ),
+                  CustomPaint(
+                    size: Size(screenWidth, screenHigh),
+                    painter: Line(),
                   ),
-                )
-              ],
+
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.all(25),
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.red,
+                        child: Icon(_isRecording ? Icons.stop : Icons.circle),
+                        onPressed: () => _recordVideo(),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),
