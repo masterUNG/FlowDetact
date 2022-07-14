@@ -2,6 +2,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flowdetect/screens/show_video_player.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flowdetect/models/sqlite_model.dart';
@@ -101,7 +102,7 @@ class _VideoUploadState extends State<VideoUpload> {
       ),
       body: load
           ? MainStyle().showProgressBar()
-          : Column(
+          : ListView(
               children: [
                 Container(
                   decoration: BoxDecoration(color: Colors.blue),
@@ -195,6 +196,12 @@ class _VideoUploadState extends State<VideoUpload> {
                                 )
                                     .then((value) {
                                   print('##13july value from api ==> $value');
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ShowVideoPlayer(
+                                            urlVideo: value.toString()),
+                                      ));
                                 }).catchError((error) {
                                   print('##13july error from api ==> $error');
                                 });
